@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createIssueSchema } from '@/app/validationSchemas';
 import { z } from 'zod';
+import Spinner from '@/app/components/Spinner';
 
 type IssueForm = z.infer<typeof createIssueSchema>;
 
@@ -26,6 +27,7 @@ const NewIssuePage = () => {
   });
 
   const [error, setError] = useState('');
+  const [isSubmitting, setSubmitting] = useState(false);
 
   return (
     <div className="max-w-xl p-5">
@@ -41,9 +43,11 @@ const NewIssuePage = () => {
         className="space-y-3"
         onSubmit={handleSubmit(async (data) => {
           try {
+            setSubmitting(true);
             await axios.post('/api/issues', data);
             router.push('/issues');
           } catch (error) {
+            setSubmitting(false);
             setError('An error occurred while creating the issue.');
           }
         })}
@@ -51,7 +55,7 @@ const NewIssuePage = () => {
         <TextField.Root placeholder="Title" {...register('title')} />
         {errors.title && (
           <Text color="red" as="p">
-            {errors.title.message}
+            {errors.title?.message}
           </Text>
         )}
 
@@ -64,11 +68,13 @@ const NewIssuePage = () => {
         />
         {errors.description && (
           <Text color="red" as="p">
-            {errors.description.message}
+            {errors.description?.message}
           </Text>
         )}
 
-        <Button>Submit New Issue</Button>
+        <Button disabled={isSubmitting}>
+          Submit New Issue {isSubmitting && <Spinner />}
+        </Button>
       </form>
     </div>
   );
