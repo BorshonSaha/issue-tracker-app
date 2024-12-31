@@ -1,7 +1,6 @@
 'use client';
 import { TextField, Button, Callout, Text } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
-import SimpleMDE from 'react-simplemde-editor';
 import { useForm, Controller } from 'react-hook-form';
 import 'easymde/dist/easymde.min.css';
 import axios from 'axios';
@@ -11,8 +10,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createIssueSchema } from '@/app/validationSchemas';
 import { z } from 'zod';
 import Spinner from '@/app/components/Spinner';
+import delay from 'delay';
+import dynamic from 'next/dynamic';
 
 type IssueForm = z.infer<typeof createIssueSchema>;
+
+const SimpleMDE = dynamic(
+  () => import('react-simplemde-editor'),
+  { ssr: false }
+);
 
 const NewIssuePage = () => {
   const router = useRouter();
@@ -39,6 +45,8 @@ const NewIssuePage = () => {
       setError('An error occurred while creating the issue.');
     }
   });
+
+  delay(2000);
 
   return (
     <div className="max-w-xl p-5">
